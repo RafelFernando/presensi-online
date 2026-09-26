@@ -22,6 +22,7 @@ export default async function PresensiPage() {
     // Ambil presensi hari ini
     const presensi = await prisma.presensi.findFirst({
         where: {
+            userId: session.user.id,
             tanggal: {
                 gte: startOfDay,
                 lte: endOfDay,

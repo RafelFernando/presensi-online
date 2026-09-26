@@ -33,7 +33,7 @@ export default function PresensiButtons({
                         disabled
                         className="cursor-not-allowed rounded-xl bg-gray-300 px-5 py-3 font-semibold text-gray-500"
                     >
-                        Sudah Presensi Masuk
+                        Masuk
                     </button>
                 ) : !gpsAktif ? (
                     <button
@@ -67,7 +67,7 @@ export default function PresensiButtons({
                         disabled
                         className="cursor-not-allowed rounded-xl bg-gray-300 px-5 py-3 font-semibold text-gray-500"
                     >
-                        Sudah Presensi Pulang
+                        Pulang
                     </button>
                 ) : !gpsAktif ? (
                     <button
@@ -92,6 +92,13 @@ export default function PresensiButtons({
                     className="mt-4 block w-full rounded-xl border border-gray-300 bg-white px-5 py-3 text-center font-semibold text-gray-700 transition hover:bg-gray-50 sm:col-span-2"
                 >
                     Lihat Detail Presensi
+                </Link>
+
+                <Link
+                    href="/presensi/history"
+                    className="block w-full rounded-xl border border-gray-300 bg-white px-5 py-3 text-center font-semibold text-gray-700 transition hover:bg-gray-50 sm:col-span-2"
+                >
+                    Lihat Riwayat Presensi
                 </Link>
             </div>
         </>
