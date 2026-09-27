@@ -138,34 +138,34 @@ export default async function PresensiTable() {
     return (
         <div className="bg-white p-3 sm:p-4 mt-5 shadow-sm rounded-lg">
             <div className="w-full overflow-x-auto">
-                <table className="w-full min-w-225 divide-y divide-gray-200">
+                <table className="w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Tanggal
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Waktu
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Type
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Foto
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Lokasi
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-40 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-40 text-sm font-bold text-gray-700 uppercase text-left">
                                 Metode Presensi
                             </th>
 
-                            <th className="px-3 sm:px-4 md:px-6 py-3 w-32 text-xs sm:text-sm font-bold text-gray-700 uppercase text-left whitespace-nowrap">
+                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
                                 Status
                             </th>
                         </tr>
