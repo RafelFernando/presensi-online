@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth/auth";
 import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 export const SignUpCredentials = async (prevState: unknown, formData: FormData) => {
     const validatedFields = RegisterSchema.safeParse(Object.fromEntries(formData));
@@ -62,4 +63,6 @@ export const SignInCredentials = async (prevState: unknown, formData: FormData) 
         }
         throw error;
     }
+    revalidatePath("/presensi");
+    redirect("/presensi");
 }

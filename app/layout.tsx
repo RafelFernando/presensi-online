@@ -4,6 +4,7 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/lib/auth/auth";
+import TopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SessionProvider session={session}>
+        <SessionProvider session={session} refetchOnWindowFocus={true} refetchInterval={0}>
+          <TopLoader color="#2563eb" height={5} />
           {children}
         </SessionProvider>
       </body>

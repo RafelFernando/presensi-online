@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth/auth";
 import DetailPresensiMapWrapper from "@/components/detail-presensi-map-wrapper";
 
 export default async function DetailPresensi() {
+    const session = await auth();
+    if (!session?.user?.id) redirect("/login");
     const now = new Date();
 
     // Awal hari
@@ -16,6 +20,7 @@ export default async function DetailPresensi() {
 
     const presensi = await prisma.presensi.findFirst({
         where: {
+            userId: session.user.id,
             tanggal: {
                 gte: startOfDay,
                 lte: endOfDay,

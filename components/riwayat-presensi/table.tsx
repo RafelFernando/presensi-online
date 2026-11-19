@@ -2,253 +2,261 @@ import { getPresensiByUserId } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import clsx from "clsx";
+import FilterBulan from "./filter-bulan";
 
-export default async function PresensiTable() {
-    type TableData = {
-        id: string;
-        tanggal: Date;
-        jenis: string;
-        jam: Date | null;
-        foto: string | null;
-        latitude: number | null;
-        longitude: number | null;
-        catatan: string | null;
-        status: "Hadir" | "Tidak Hadir" | "Hari Libur";
-    };
+type TableData = {
+  id: string;
+  tanggal: Date;
+  jenis: string;
+  jam: Date | null;
+  foto: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  catatan: string | null;
+  status: "Hadir" | "Tidak Hadir" | "Hari Libur";
+};
 
-    const presensi = await getPresensiByUserId();
+export default async function PresensiTable({
+  month,
+  year,
+}: {
+  month: number;
+  year: number;
+}) {
+  const presensi = await getPresensiByUserId({ month, year });
 
-    // Ambil tanggal hari ini
-    const today = new Date();
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0);
 
-    // Awal bulan
-    const startOfMonth = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        1
-    );
+  // Buat semua tanggal dalam bulan yang dipilih
+  const dates: Date[] = [];
+  for (
+    let d = new Date(startOfMonth);
+    d <= endOfMonth;
+    d.setDate(d.getDate() + 1)
+  ) {
+    dates.push(new Date(d));
+  }
 
-    // Akhir bulan
-    const endOfMonth = new Date(
-        today.getFullYear(),
-        today.getMonth() + 1,
-        0
-    );
+  const tableData: TableData[] = dates.flatMap((date) => {
+    const day = date.getDay();
+    const isWeekend = day === 0 || day === 6;
 
-    // Buat semua tanggal dalam bulan berjalan
-    const dates = [];
-
-    for (
-        let date = new Date(startOfMonth);
-        date <= endOfMonth;
-        date.setDate(date.getDate() + 1)
-    ) {
-        dates.push(new Date(date));
-    }
-
-    // Buat data tabel
-    const tableData: TableData[] = dates.flatMap((date) => {
-        // 0 = Minggu
-        // 6 = Sabtu
-        const day = date.getDay();
-
-        const isWeekend = day === 0 || day === 6;
-
-        // Cari presensi pada tanggal tersebut
-        const attendance = presensi?.find((item) => {
-            const attendanceDate = new Date(item.tanggal);
-
-            return (
-                attendanceDate.getFullYear() === date.getFullYear() &&
-                attendanceDate.getMonth() === date.getMonth() &&
-                attendanceDate.getDate() === date.getDate()
-            );
-        });
-
-        // Sabtu / Minggu
-        if (isWeekend) {
-            return [
-                {
-                    id: `libur-${date.toISOString()}`,
-                    tanggal: date,
-                    jenis: "-",
-                    jam: null,
-                    foto: null,
-                    latitude: null,
-                    longitude: null,
-                    catatan: null,
-                    status: "Hari Libur",
-                },
-            ];
-        }
-
-        // Senin - Jumat tetapi tidak ada presensi
-        if (!attendance) {
-            return [
-                {
-                    id: `tidak-hadir-${date.toISOString()}`,
-                    tanggal: date,
-                    jenis: "-",
-                    jam: null,
-                    foto: null,
-                    latitude: null,
-                    longitude: null,
-                    catatan: null,
-                    status: "Tidak Hadir",
-                },
-            ];
-        }
-
-        // Kalau ada presensi
-        const data: TableData[] = [];
-
-        // Presensi masuk
-        if (attendance.jam_masuk) {
-            data.push({
-                id: `${attendance.id}-masuk`,
-                tanggal: date,
-                jenis: "Masuk",
-                jam: attendance.jam_masuk,
-                foto: attendance.foto_masuk,
-                latitude: attendance.checkInLatitude,
-                longitude: attendance.checkInLongitude,
-                catatan: attendance.catatan_masuk,
-                status: "Hadir",
-            });
-        }
-
-        // Presensi keluar
-        if (attendance.jam_keluar) {
-            data.push({
-                id: `${attendance.id}-keluar`,
-                tanggal: date,
-                jenis: "Keluar",
-                jam: attendance.jam_keluar,
-                foto: attendance.foto_keluar,
-                latitude: attendance.checkOutLatitude,
-                longitude: attendance.checkOutLongitude,
-                catatan: attendance.catatan_keluar,
-                status: "Hadir",
-            });
-        }
-
-        return data;
+    const attendance = presensi?.find((item) => {
+      const attendanceDate = new Date(item.tanggal);
+      return (
+        attendanceDate.getFullYear() === date.getFullYear() &&
+        attendanceDate.getMonth() === date.getMonth() &&
+        attendanceDate.getDate() === date.getDate()
+      );
     });
 
-    return (
-        <div className="bg-white p-3 sm:p-4 mt-5 shadow-sm rounded-lg">
-            <div className="w-full overflow-x-auto">
-                <table className="w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Tanggal
-                            </th>
+    if (isWeekend) {
+      return [
+        {
+          id: `libur-${date.toISOString()}`,
+          tanggal: date,
+          jenis: "-",
+          jam: null,
+          foto: null,
+          latitude: null,
+          longitude: null,
+          catatan: null,
+          status: "Hari Libur" as const,
+        },
+      ];
+    }
 
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Waktu
-                            </th>
+    if (!attendance) {
+      return [
+        {
+          id: `tidak-hadir-${date.toISOString()}`,
+          tanggal: date,
+          jenis: "-",
+          jam: null,
+          foto: null,
+          latitude: null,
+          longitude: null,
+          catatan: null,
+          status: "Tidak Hadir" as const,
+        },
+      ];
+    }
 
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Type
-                            </th>
+    const data: TableData[] = [];
 
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Foto
-                            </th>
+    if (attendance.jam_masuk) {
+      data.push({
+        id: `${attendance.id}-masuk`,
+        tanggal: date,
+        jenis: "Masuk",
+        jam: attendance.jam_masuk,
+        foto: attendance.foto_masuk,
+        latitude: attendance.checkInLatitude,
+        longitude: attendance.checkInLongitude,
+        catatan: attendance.catatan_masuk,
+        status: "Hadir",
+      });
+    }
 
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Lokasi
-                            </th>
+    if (attendance.jam_keluar) {
+      data.push({
+        id: `${attendance.id}-keluar`,
+        tanggal: date,
+        jenis: "Keluar",
+        jam: attendance.jam_keluar,
+        foto: attendance.foto_keluar,
+        latitude: attendance.checkOutLatitude,
+        longitude: attendance.checkOutLongitude,
+        catatan: attendance.catatan_keluar,
+        status: "Hadir",
+      });
+    }
 
-                            <th className="px-6 py-3 w-40 text-sm font-bold text-gray-700 uppercase text-left">
-                                Metode Presensi
-                            </th>
+    return data;
+  });
 
-                            <th className="px-6 py-3 w-32 text-sm font-bold text-gray-700 uppercase text-left">
-                                Status
-                            </th>
-                        </tr>
-                    </thead>
+  // ===== Hitung total per HARI (bukan per baris) =====
+  const hariKerja = dates.filter((d) => d.getDay() !== 0 && d.getDay() !== 6).length;
 
-                    <tbody className="divide-y divide-gray-200">
-                        {tableData.map((item) => (
-                            <tr
-                                key={item.id}
-                                className="hover:bg-gray-100 transition-colors"
-                            >
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm">
-                                    {formatDate(item.tanggal.toString())}
-                                </td>
+  const hariHadir = new Set(
+    tableData
+      .filter((item) => item.status === "Hadir")
+      .map((item) => new Date(item.tanggal).toDateString())
+  ).size;
 
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm">
-                                    {item.jam
-                                        ? new Date(item.jam).toLocaleTimeString(
-                                            "id-ID",
-                                            {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            }
-                                        )
-                                        : "-"}
-                                </td>
+  const hariTidakHadir = hariKerja - hariHadir;
 
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm">
-                                    {item.jenis}
-                                </td>
+  return (
+    <>
+      {/* ===== Filter Bulan ===== */}
+      <FilterBulan month={month} year={year} />
 
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
-                                    {item.foto ? (
-                                        <div className="relative w-20 h-14 sm:w-24 sm:h-16 md:w-32 md:h-20">
-                                            <Image
-                                                src={item.foto}
-                                                fill
-                                                sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, 128px"
-                                                alt="foto presensi"
-                                                className="object-cover rounded-md"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <span className="text-sm text-gray-500">
-                                            -
-                                        </span>
-                                    )}
-                                </td>
-
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm">
-                                    SPPG Laweyan Laweyan
-                                </td>
-
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm">
-                                    {item.status === "Hadir"
-                                        ? "Presensi Online"
-                                        : "-"}
-                                </td>
-
-                                <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap">
-                                    <span
-                                        className={clsx(
-                                            "inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium",
-                                            {
-                                                "bg-green-100 text-green-700":
-                                                    item.status === "Hadir",
-
-                                                "bg-red-100 text-red-700":
-                                                    item.status === "Tidak Hadir",
-
-                                                "bg-gray-100 text-gray-600":
-                                                    item.status === "Hari Libur",
-                                            }
-                                        )}
-                                    >
-                                        {item.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+      {/* ===== Summary Cards ===== */}
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            Hari Kerja
+          </p>
+          <p className="mt-1 text-2xl font-bold text-gray-900">{hariKerja}</p>
+          <p className="text-xs text-gray-500">Senin – Jumat</p>
         </div>
-    );
+
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-5 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-green-600">
+            Hadir
+          </p>
+          <p className="mt-1 text-2xl font-bold text-green-700">{hariHadir}</p>
+          <p className="text-xs text-green-600">
+            {hariKerja > 0
+              ? `${Math.round((hariHadir / hariKerja) * 100)}% kehadiran`
+              : "—"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-red-600">
+            Tidak Hadir
+          </p>
+          <p className="mt-1 text-2xl font-bold text-red-700">{hariTidakHadir}</p>
+          <p className="text-xs text-red-600">Hari kerja tanpa presensi</p>
+        </div>
+      </div>
+
+      {/* ===== Tabel ===== */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Tanggal
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Waktu
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Tipe
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Foto
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Lokasi
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Metode
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-100">
+              {tableData.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
+                    Tidak ada data pada bulan ini.
+                  </td>
+                </tr>
+              ) : (
+                tableData.map((item) => (
+                  <tr key={item.id} className="transition-colors hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      {formatDate(item.tanggal.toString())}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      {item.jam
+                        ? new Date(item.jam).toLocaleTimeString("id-ID", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "-"}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">{item.jenis}</td>
+                    <td className="px-4 py-3">
+                      {item.foto ? (
+                        <div className="relative h-14 w-20 overflow-hidden rounded-md sm:h-16 sm:w-24">
+                          <Image
+                            src={item.foto}
+                            fill
+                            sizes="(max-width: 640px) 80px, 96px"
+                            alt="foto presensi"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      {item.latitude && item.longitude ? "SPPG Laweyan" : "-"}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      {item.status === "Hadir" ? "Presensi Online" : "-"}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <span
+                        className={clsx(
+                          "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium",
+                          {
+                            "bg-green-100 text-green-700": item.status === "Hadir",
+                            "bg-red-100 text-red-700": item.status === "Tidak Hadir",
+                            "bg-gray-100 text-gray-600": item.status === "Hari Libur",
+                          }
+                        )}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
 }
