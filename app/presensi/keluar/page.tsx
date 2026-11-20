@@ -1,11 +1,11 @@
 import KeluarForm from "@/components/keluar-form";
-import Navbar from "@/components/navbar/navbar";
+import NavbarLayout from "@/components/navbar/navbar-layout";
 
 export default function PresensiKeluar() {
     return (
         <>
-            <Navbar />
-            <main className="min-h-screen bg-gray-100 p-5 mt-20">
+            <NavbarLayout />
+            <main className="min-h-screen bg-gray-100 p-5 mt-5">
                 <KeluarForm />
             </main>
         </>

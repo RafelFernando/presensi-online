@@ -1,11 +1,11 @@
 import CreatePresensiForm from "@/components/masuk-form";
-import Navbar from "@/components/navbar/navbar";
+import NavbarLayout from "@/components/navbar/navbar-layout";
 
 export default function PresensiMasuk() {
     return (
         <>
-            <Navbar />
-            <main className="min-h-screen bg-gray-100 p-5 mt-20">
+            <NavbarLayout />
+            <main className="min-h-screen bg-gray-100 p-5 mt-5">
                 <CreatePresensiForm />
             </main>
         </>

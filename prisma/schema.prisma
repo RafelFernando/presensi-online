@@ -19,6 +19,14 @@ model User {
   password String?
   role     String     @default("user")
   presensi Presensi[]
+  jabatan  Jabatan[]
+}
+
+model Jabatan {
+  id String @id @default(cuid())
+  user_id String
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  nama_jabatan String
 }
 
 model Presensi {

@@ -1,5 +1,5 @@
 import PresensiTable from "@/components/riwayat-presensi/table";
-import Navbar from "@/components/navbar/navbar";
+import NavbarLayout from "@/components/navbar/navbar-layout";
 import { Suspense } from "react";
 import Link from "next/link";
 
@@ -22,8 +22,8 @@ export default async function HistoryPage({
 
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+      <NavbarLayout />
+      <main className="min-h-screen bg-gray-50 pt-5 pb-10 px-4">
         <div className="mx-auto w-full max-w-6xl">
           {/* Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -50,7 +50,7 @@ export const SignInCredentials = async (prevState: unknown, formData: FormData) 
             email,
             password,
             recaptchaToken,
-            redirectTo: "/presensi",
+            redirectTo: "/",
         })
     } catch (error) {
         if (error instanceof AuthError) {

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { FaIdCard } from "react-icons/fa";
 import Clock from "@/components/clock";
-import Navbar from "@/components/navbar/navbar";
+import NavbarLayout from "@/components/navbar/navbar-layout";
 
 export default async function PresensiPage() {
   const session = await auth();
@@ -63,11 +63,10 @@ export default async function PresensiPage() {
   });
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pt-24 pb-10 px-4">
+    <div>
+      <NavbarLayout />
+      <main className="min-h-screen bg-linear-to-b from-gray-50 to-gray-100 pt-5 pb-10 px-4">
         <div className="mx-auto w-full max-w-md space-y-4">
-          {/* ===== Kartu Profil ===== */}
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div className="flex items-center gap-4 p-5">
               <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-white shadow">
@@ -159,6 +158,6 @@ export default async function PresensiPage() {
           </div>
         </div>
       </main>
-    </>
+    </div>
   );
 }
